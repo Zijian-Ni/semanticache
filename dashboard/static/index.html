@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SemantiCache Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="12" cy="12" r="4" fill="currentColor" opacity="0.6"/>
+          <path d="M12 2C6.48 2 2 6.48 2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        </svg>
+      </div>
+      <h1 class="header-title">SemantiCache</h1>
+      <span class="header-badge">Dashboard</span>
+    </div>
+    <div class="header-right">
+      <div class="connection-status" id="connectionStatus">
+        <span class="status-dot"></span>
+        <span class="status-text">Connecting</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Metric Cards -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Hit Rate</div>
+        <div class="metric-value" id="hitRate">0<span class="metric-unit">%</span></div>
+        <div class="metric-sub" id="hitRateSub">0 hits / 0 misses</div>
+      </div>
+      <div class="metric-card accent-green">
+        <div class="metric-label">Cost Saved</div>
+        <div class="metric-value" id="costSaved"><span class="metric-unit">$</span>0.00</div>
+        <div class="metric-sub">Estimated savings</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Total Requests</div>
+        <div class="metric-value" id="totalRequests">0</div>
+        <div class="metric-sub" id="totalRequestsSub">Lifetime queries</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Cache Size</div>
+        <div class="metric-value" id="cacheSize">0</div>
+        <div class="metric-sub">Cached entries</div>
+      </div>
+    </section>
+
+    <!-- Charts & Lists -->
+    <section class="panels">
+      <div class="panel chart-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Similarity Distribution</h2>
+          <span class="panel-subtitle">Cosine similarity of incoming queries</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="similarityChart"></canvas>
+        </div>
+      </div>
+
+      <div class="panel list-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Top Cached Queries</h2>
+          <span class="panel-subtitle">Most frequently matched</span>
+        </div>
+        <div class="query-list" id="queryList">
+          <div class="empty-state">No queries cached yet</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script src="/static/main.js"></script>
+</body>
+</html>
