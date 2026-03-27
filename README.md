@@ -25,6 +25,20 @@ Stop paying for the same LLM responses twice. **SemantiCache** intercepts your A
 
 Real-world workloads see **30-60% cache hit rates**, translating directly to cost savings.
 
+## Architecture
+
+See the full [architecture diagram](docs/architecture.md) for system design details.
+
+```
+Client → SemantiCache Core → [Security Layer] → [Embedder] → [Backend]
+                ↓                                                 ↓
+         [Strategies]                                    [In-Memory / Redis]
+         (LRU, Batch, Namespaces)
+                ↓
+         [Observability]
+         (Prometheus, Histograms, Cost Tracking)
+```
+
 ## Quick Start
 
 ```bash
@@ -40,14 +54,14 @@ async def main():
 
     result = await cache.cache(
         prompt="What is the capital of France?",
-        generator=lambda p: "The capital of France is Paris.",
+        generator=lambda: "The capital of France is Paris.",
     )
     print(result.response)  # "The capital of France is Paris."
     print(result.hit)        # False (first call)
 
     result = await cache.cache(
         prompt="Tell me the capital city of France",
-        generator=lambda p: "This won't be called!",
+        generator=lambda: "This won't be called!",
     )
     print(result.hit)              # True
     print(result.similarity_score) # 0.95+
@@ -73,28 +87,74 @@ response = await client.chat.completions.create(
 )
 ```
 
-## Real-time Dashboard
+## Security
 
-SemantiCache ships with a built-in metrics dashboard:
+SemantiCache includes a built-in security layer. See [docs/security.md](docs/security.md).
+
+```python
+from semanticache.security import sanitize_input, CacheEncryptor
+
+# Sanitize user input
+clean = sanitize_input(user_prompt, max_length=32000)
+
+# Encrypt cached responses at rest
+key = CacheEncryptor.generate_key()
+encryptor = CacheEncryptor(key)
+encrypted = encryptor.encrypt("LLM response")
+```
+
+## Cache Strategies
+
+```python
+from semanticache.strategies import LRUEvictionPolicy, batch_cache_put, warm_cache
+
+# LRU eviction
+policy = LRUEvictionPolicy(max_entries=10000, frequency_weight=0.3)
+
+# Batch caching
+items = [BatchCacheItem(prompt="p1", response="r1"), ...]
+await batch_cache_put(cache, items)
+
+# Warm cache from file
+await warm_cache(cache, "warmup_data.json")
+```
+
+## CLI
+
+```bash
+pip install semanticache[cli]
+
+semanticache serve              # Start dashboard server
+semanticache stats              # Show cache statistics
+semanticache stats -f json      # JSON output
+semanticache clear --yes        # Clear cache
+semanticache benchmark -n 5000  # Performance benchmark
+```
+
+## Real-time Dashboard
 
 ```bash
 pip install semanticache[dashboard]
+semanticache serve --port 8080
 ```
-
-```python
-from semanticache import SemantiCache
-from dashboard.app import create_app
-import uvicorn
-
-cache = SemantiCache()
-app = create_app(cache=cache)
-uvicorn.run(app, host="0.0.0.0", port=8080)
-```
-
-<!-- Screenshot placeholder -->
-<!-- ![Dashboard](docs/assets/dashboard.png) -->
 
 Dark mode, real-time WebSocket updates, cost savings tracker, similarity distribution charts.
+
+## Observability
+
+```python
+metrics = cache.get_metrics()
+
+# Prometheus-compatible export
+tracker = cache._metrics
+print(tracker.to_prometheus())
+
+# CSV export
+print(tracker.to_csv())
+
+# Per-model cost tracking
+tracker.record_hit(model="gpt-4", similarity_score=0.95)
+```
 
 ## Configuration
 
@@ -103,7 +163,7 @@ Dark mode, real-time WebSocket updates, cost savings tracker, similarity distrib
 | `similarity_threshold` | `0.92` | Minimum cosine similarity for a cache hit |
 | `ttl` | `86400` (24h) | Time-to-live in seconds |
 | `backend` | `InMemoryBackend()` | Storage backend (`InMemoryBackend` or `RedisBackend`) |
-| `embedder` | `SentenceTransformerEmbedder()` | Embedding model (`SentenceTransformerEmbedder` or `OpenAIEmbedder`) |
+| `embedder` | `SentenceTransformerEmbedder()` | Embedding model |
 | `metrics_enabled` | `True` | Enable hit/miss/cost tracking |
 
 ## Backends
@@ -133,43 +193,6 @@ backend = RedisBackend(url="redis://localhost:6379")
 cache = SemantiCache(backend=backend)
 ```
 
-## Embedders
-
-### Sentence Transformers (default)
-
-Runs locally — no API key needed:
-
-```python
-from semanticache.embedders.sentence_transformers import SentenceTransformerEmbedder
-embedder = SentenceTransformerEmbedder(model_name="all-MiniLM-L6-v2")
-```
-
-### OpenAI Embeddings
-
-```bash
-pip install semanticache[openai]
-```
-
-```python
-from semanticache.embedders.openai import OpenAIEmbedder
-embedder = OpenAIEmbedder(model="text-embedding-3-small")
-```
-
-## Metrics & Cost Tracking
-
-```python
-metrics = cache.get_metrics()
-print(metrics)
-# {
-#     "total_requests": 1000,
-#     "cache_hits": 420,
-#     "cache_misses": 580,
-#     "hit_rate": 0.42,
-#     "cost_saved": 12.50,
-#     "avg_similarity": 0.96
-# }
-```
-
 ## Performance
 
 | Metric | Value |
@@ -179,6 +202,8 @@ print(metrics)
 | Cache lookup (100k entries) | ~15ms |
 | Memory per entry | ~3KB |
 
+See [docs/benchmarks.md](docs/benchmarks.md) for detailed benchmarks.
+
 ## Installation Options
 
 ```bash
@@ -186,12 +211,23 @@ pip install semanticache                  # Core + sentence-transformers
 pip install semanticache[openai]          # + OpenAI embeddings
 pip install semanticache[redis]           # + Redis backend
 pip install semanticache[dashboard]       # + Web dashboard
+pip install semanticache[security]        # + AES-256 encryption
+pip install semanticache[cli]             # + CLI tool
 pip install semanticache[all]             # Everything
 ```
 
+## Documentation
+
+- [Getting Started](docs/getting-started.md)
+- [Configuration](docs/configuration.md)
+- [Architecture](docs/architecture.md)
+- [Security Model](docs/security.md)
+- [Benchmarks](docs/benchmarks.md)
+- [API Reference](docs/api-reference.md)
+
 ## Contributing
 
-Contributions are welcome! Please open an issue first to discuss what you'd like to change.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ```bash
 git clone https://github.com/ZijianNi/semanticache.git
@@ -202,4 +238,4 @@ pytest
 
 ## License
 
-[PolyForm Shield License 1.0.0](LICENSE) — Copyright (c) 2026 Zijian Ni (倪子健)
+[PolyForm Shield License 1.0.0](LICENSE) — Copyright (c) 2026 Zijian Ni
