@@ -5,7 +5,7 @@
   </p>
   <p align="center">
     <a href="https://pypi.org/project/semanticache/"><img src="https://img.shields.io/pypi/v/semanticache?color=blue&style=flat-square" alt="PyPI"></a>
-    <a href="https://github.com/ZijianNi/semanticache/actions"><img src="https://img.shields.io/github/actions/workflow/status/ZijianNi/semanticache/test.yml?style=flat-square" alt="Tests"></a>
+    <a href="https://github.com/Zijian-Ni/semanticache/actions"><img src="https://img.shields.io/github/actions/workflow/status/Zijian-Ni/semanticache/test.yml?style=flat-square" alt="Tests"></a>
     <img src="https://img.shields.io/pypi/pyversions/semanticache?style=flat-square" alt="Python">
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-PolyForm--Shield--1.0.0-green?style=flat-square" alt="License"></a>
   </p>
@@ -230,7 +230,7 @@ pip install semanticache[all]             # Everything
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ```bash
-git clone https://github.com/ZijianNi/semanticache.git
+git clone https://github.com/Zijian-Ni/semanticache.git
 cd semanticache
 pip install -e ".[dev]"
 pytest

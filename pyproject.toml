@@ -47,9 +47,9 @@ dev = [
 semanticache = "semanticache.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/ZijianNi/semanticache"
-Documentation = "https://github.com/ZijianNi/semanticache/docs"
-Repository = "https://github.com/ZijianNi/semanticache"
+Homepage = "https://github.com/Zijian-Ni/semanticache"
+Documentation = "https://github.com/Zijian-Ni/semanticache/docs"
+Repository = "https://github.com/Zijian-Ni/semanticache"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
