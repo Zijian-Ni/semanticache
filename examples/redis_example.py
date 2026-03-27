@@ -8,6 +8,7 @@ Requirements:
     pip install semanticache[redis]
     # A running Redis server (e.g. redis://localhost:6379)
 """
+
 import asyncio
 from semanticache import SemantiCache
 from semanticache.backends.redis import RedisBackend

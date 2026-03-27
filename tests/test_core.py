@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from datetime import datetime, timezone
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import numpy as np
 import pytest
@@ -16,6 +16,7 @@ from semanticache.core import CacheResult, SemantiCache
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 def _make_embedder(vectors: dict[str, np.ndarray] | None = None):
     """Create a mock embedder that returns predetermined vectors.
 
@@ -25,6 +26,7 @@ def _make_embedder(vectors: dict[str, np.ndarray] | None = None):
     embedder = AsyncMock()
 
     if vectors is not None:
+
         async def _embed(text: str) -> np.ndarray:
             if text in vectors:
                 return vectors[text]
@@ -35,6 +37,7 @@ def _make_embedder(vectors: dict[str, np.ndarray] | None = None):
 
         embedder.embed = AsyncMock(side_effect=_embed)
     else:
+
         async def _embed_random(text: str) -> np.ndarray:
             rng = np.random.default_rng(hash(text) % 2**32)
             v = rng.standard_normal(384).astype(np.float32)
@@ -75,6 +78,7 @@ def dissimilar_vector():
 # CacheResult dataclass
 # ---------------------------------------------------------------------------
 
+
 class TestCacheResult:
     def test_creation(self):
         result = CacheResult(
@@ -101,9 +105,7 @@ class TestCacheResult:
         assert result.cached_at == now
 
     def test_frozen(self):
-        result = CacheResult(
-            response="x", hit=False, similarity_score=0.0, latency_ms=0.0
-        )
+        result = CacheResult(response="x", hit=False, similarity_score=0.0, latency_ms=0.0)
         with pytest.raises(AttributeError):
             result.response = "y"  # type: ignore[misc]
 
@@ -111,6 +113,7 @@ class TestCacheResult:
 # ---------------------------------------------------------------------------
 # SemantiCache initialisation
 # ---------------------------------------------------------------------------
+
 
 class TestSemantiCacheInit:
     def test_defaults(self):
@@ -147,6 +150,7 @@ class TestSemantiCacheInit:
 # ---------------------------------------------------------------------------
 # Put and Get
 # ---------------------------------------------------------------------------
+
 
 class TestPutAndGet:
     @pytest.fixture
@@ -206,6 +210,7 @@ class TestPutAndGet:
 # ---------------------------------------------------------------------------
 # cache() method (with generator)
 # ---------------------------------------------------------------------------
+
 
 class TestCacheMethod:
     async def test_miss_calls_generator(self, fixed_vector):
@@ -269,6 +274,7 @@ class TestCacheMethod:
 # TTL expiration
 # ---------------------------------------------------------------------------
 
+
 class TestTTLExpiration:
     async def test_expired_entry_not_returned(self, fixed_vector):
         from semanticache.backends.memory import InMemoryBackend
@@ -294,6 +300,7 @@ class TestTTLExpiration:
 # ---------------------------------------------------------------------------
 # Clear cache
 # ---------------------------------------------------------------------------
+
 
 class TestClearCache:
     async def test_clear_all(self, fixed_vector):
@@ -332,6 +339,7 @@ class TestClearCache:
 # ---------------------------------------------------------------------------
 # Metrics tracking
 # ---------------------------------------------------------------------------
+
 
 class TestMetrics:
     async def test_metrics_record_miss(self, fixed_vector):
@@ -411,6 +419,7 @@ class TestMetrics:
 # ---------------------------------------------------------------------------
 # Namespace isolation
 # ---------------------------------------------------------------------------
+
 
 class TestNamespaceIsolation:
     async def test_namespaces_are_isolated(self, fixed_vector):

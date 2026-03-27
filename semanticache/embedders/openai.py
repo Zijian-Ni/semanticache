@@ -42,8 +42,7 @@ class OpenAIEmbedder(BaseEmbedder):
                 import openai
             except ImportError as exc:
                 raise ImportError(
-                    "openai is required for OpenAIEmbedder. "
-                    "Install it with: pip install openai"
+                    "openai is required for OpenAIEmbedder. Install it with: pip install openai"
                 ) from exc
 
             kwargs: dict[str, Any] = {}

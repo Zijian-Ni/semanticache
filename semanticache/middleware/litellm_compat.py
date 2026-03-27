@@ -64,8 +64,7 @@ class CachedLiteLLM:
             import litellm
         except ImportError as exc:
             raise ImportError(
-                "litellm is required for CachedLiteLLM. "
-                "Install it with: pip install litellm"
+                "litellm is required for CachedLiteLLM. Install it with: pip install litellm"
             ) from exc
 
         messages: list[dict[str, str]] = kwargs.get("messages", [])

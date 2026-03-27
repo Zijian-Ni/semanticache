@@ -6,8 +6,8 @@ import asyncio
 import logging
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Callable, Optional
+from datetime import datetime
+from typing import Any, Callable
 
 from semanticache.backends import BaseBackend
 from semanticache.embedders import BaseEmbedder
@@ -176,9 +176,7 @@ class SemantiCache:
         if self._metrics is not None:
             self._metrics.record_hit(similarity_score=similarity)
 
-        logger.debug(
-            "Cache hit in namespace %r (similarity=%.4f)", namespace, similarity
-        )
+        logger.debug("Cache hit in namespace %r (similarity=%.4f)", namespace, similarity)
 
         return CacheResult(
             response=response_text,

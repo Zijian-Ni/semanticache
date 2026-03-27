@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import datetime
 
 import numpy as np
 import pytest
@@ -15,6 +15,7 @@ from semanticache.backends.memory import InMemoryBackend
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _unit_vector(dim: int = 384, seed: int = 0) -> np.ndarray:
     """Return a deterministic unit vector."""
     rng = np.random.default_rng(seed)
@@ -25,6 +26,7 @@ def _unit_vector(dim: int = 384, seed: int = 0) -> np.ndarray:
 # ---------------------------------------------------------------------------
 # InMemoryBackend
 # ---------------------------------------------------------------------------
+
 
 class TestInMemoryBackendStore:
     async def test_store_returns_key(self):
@@ -208,9 +210,7 @@ class TestInMemoryBackendTTL:
 
         await asyncio.sleep(1.1)
 
-        result = await backend.search(
-            embedding=vec, namespace="default", threshold=0.50, ttl=1
-        )
+        result = await backend.search(embedding=vec, namespace="default", threshold=0.50, ttl=1)
         assert result is None
 
     async def test_non_expired_entries_returned(self):
@@ -225,9 +225,7 @@ class TestInMemoryBackendTTL:
             ttl=3600,
         )
 
-        result = await backend.search(
-            embedding=vec, namespace="default", threshold=0.50, ttl=3600
-        )
+        result = await backend.search(embedding=vec, namespace="default", threshold=0.50, ttl=3600)
         assert result is not None
         assert result[0] == "still valid"
 
@@ -237,12 +235,18 @@ class TestInMemoryBackendClear:
         backend = InMemoryBackend()
 
         await backend.store(
-            embedding=_unit_vector(seed=1), response="r1",
-            namespace="ns1", metadata={}, ttl=3600,
+            embedding=_unit_vector(seed=1),
+            response="r1",
+            namespace="ns1",
+            metadata={},
+            ttl=3600,
         )
         await backend.store(
-            embedding=_unit_vector(seed=2), response="r2",
-            namespace="ns2", metadata={}, ttl=3600,
+            embedding=_unit_vector(seed=2),
+            response="r2",
+            namespace="ns2",
+            metadata={},
+            ttl=3600,
         )
 
         count = await backend.clear()
@@ -253,12 +257,18 @@ class TestInMemoryBackendClear:
         backend = InMemoryBackend()
 
         await backend.store(
-            embedding=_unit_vector(seed=1), response="r1",
-            namespace="ns1", metadata={}, ttl=3600,
+            embedding=_unit_vector(seed=1),
+            response="r1",
+            namespace="ns1",
+            metadata={},
+            ttl=3600,
         )
         await backend.store(
-            embedding=_unit_vector(seed=2), response="r2",
-            namespace="ns2", metadata={}, ttl=3600,
+            embedding=_unit_vector(seed=2),
+            response="r2",
+            namespace="ns2",
+            metadata={},
+            ttl=3600,
         )
 
         count = await backend.clear(namespace="ns1")
@@ -281,12 +291,18 @@ class TestInMemoryBackendSize:
         backend = InMemoryBackend()
 
         await backend.store(
-            embedding=_unit_vector(seed=1), response="r1",
-            namespace="ns1", metadata={}, ttl=3600,
+            embedding=_unit_vector(seed=1),
+            response="r1",
+            namespace="ns1",
+            metadata={},
+            ttl=3600,
         )
         await backend.store(
-            embedding=_unit_vector(seed=2), response="r2",
-            namespace="ns2", metadata={}, ttl=3600,
+            embedding=_unit_vector(seed=2),
+            response="r2",
+            namespace="ns2",
+            metadata={},
+            ttl=3600,
         )
 
         assert await backend.size() == 2
@@ -295,12 +311,18 @@ class TestInMemoryBackendSize:
         backend = InMemoryBackend()
 
         await backend.store(
-            embedding=_unit_vector(seed=1), response="r1",
-            namespace="ns1", metadata={}, ttl=3600,
+            embedding=_unit_vector(seed=1),
+            response="r1",
+            namespace="ns1",
+            metadata={},
+            ttl=3600,
         )
         await backend.store(
-            embedding=_unit_vector(seed=2), response="r2",
-            namespace="ns2", metadata={}, ttl=3600,
+            embedding=_unit_vector(seed=2),
+            response="r2",
+            namespace="ns2",
+            metadata={},
+            ttl=3600,
         )
 
         assert await backend.size(namespace="ns1") == 1
@@ -313,8 +335,11 @@ class TestInMemoryBackendDelete:
         backend = InMemoryBackend()
 
         key = await backend.store(
-            embedding=_unit_vector(seed=1), response="r1",
-            namespace="default", metadata={}, ttl=3600,
+            embedding=_unit_vector(seed=1),
+            response="r1",
+            namespace="default",
+            metadata={},
+            ttl=3600,
         )
 
         assert await backend.delete(key, "default") is True
@@ -329,10 +354,12 @@ class TestInMemoryBackendDelete:
 # Redis backend (skipped unless Redis is available)
 # ---------------------------------------------------------------------------
 
+
 def _redis_available() -> bool:
     """Check whether a Redis server is reachable on localhost."""
     try:
         import redis
+
         client = redis.Redis(host="localhost", port=6379, socket_connect_timeout=1)
         client.ping()
         return True
@@ -357,12 +384,18 @@ class TestRedisBackend:
         vec = _unit_vector(seed=1)
 
         await backend.store(
-            embedding=vec, response="redis response",
-            namespace="test", metadata={"m": 1}, ttl=60,
+            embedding=vec,
+            response="redis response",
+            namespace="test",
+            metadata={"m": 1},
+            ttl=60,
         )
 
         result = await backend.search(
-            embedding=vec, namespace="test", threshold=0.90, ttl=60,
+            embedding=vec,
+            namespace="test",
+            threshold=0.90,
+            ttl=60,
         )
         assert result is not None
         assert result[0] == "redis response"
@@ -370,8 +403,11 @@ class TestRedisBackend:
 
     async def test_clear(self, backend):
         await backend.store(
-            embedding=_unit_vector(seed=1), response="r",
-            namespace="test", metadata={}, ttl=60,
+            embedding=_unit_vector(seed=1),
+            response="r",
+            namespace="test",
+            metadata={},
+            ttl=60,
         )
         count = await backend.clear(namespace="test")
         assert count >= 1
@@ -379,7 +415,10 @@ class TestRedisBackend:
 
     async def test_delete(self, backend):
         key = await backend.store(
-            embedding=_unit_vector(seed=1), response="r",
-            namespace="test", metadata={}, ttl=60,
+            embedding=_unit_vector(seed=1),
+            response="r",
+            namespace="test",
+            metadata={},
+            ttl=60,
         )
         assert await backend.delete(key, "test") is True

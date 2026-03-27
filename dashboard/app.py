@@ -39,6 +39,7 @@ def _is_rate_limited(client_ip: str) -> bool:
 # Metrics provider protocol
 # ---------------------------------------------------------------------------
 
+
 class _DefaultMetrics:
     """Fallback when no SemantiCache instance is attached."""
 
@@ -61,6 +62,7 @@ class _DefaultMetrics:
 # ---------------------------------------------------------------------------
 # Application factory
 # ---------------------------------------------------------------------------
+
 
 def create_app(
     cache: Any | None = None,

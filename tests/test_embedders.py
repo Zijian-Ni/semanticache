@@ -12,14 +12,13 @@ import pytest
 # SentenceTransformerEmbedder
 # ---------------------------------------------------------------------------
 
+
 class TestSentenceTransformerEmbedder:
     @pytest.fixture
     def mock_model(self):
         """Create a mock SentenceTransformer model that returns a 384-dim vector."""
         model = MagicMock()
-        model.encode.return_value = np.random.default_rng(0).standard_normal(384).astype(
-            np.float32
-        )
+        model.encode.return_value = np.random.default_rng(0).standard_normal(384).astype(np.float32)
         return model
 
     @patch("semanticache.embedders.sentence_transformers.SentenceTransformer", create=True)
@@ -95,6 +94,7 @@ class TestSentenceTransformerEmbedder:
 # ---------------------------------------------------------------------------
 # OpenAIEmbedder (mock openai client)
 # ---------------------------------------------------------------------------
+
 
 class TestOpenAIEmbedder:
     """Tests for an OpenAI-based embedder.
@@ -173,9 +173,7 @@ class TestOpenAIEmbedder:
 
     async def test_embed_error_handling(self):
         mock_client = MagicMock()
-        mock_client.embeddings.create = AsyncMock(
-            side_effect=RuntimeError("API error")
-        )
+        mock_client.embeddings.create = AsyncMock(side_effect=RuntimeError("API error"))
 
         embedder = self._make_openai_embedder(mock_client)
 

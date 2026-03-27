@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 from dataclasses import dataclass, field
 from typing import Any
@@ -16,6 +15,7 @@ logger = logging.getLogger(__name__)
 # ------------------------------------------------------------------
 # Lightweight response wrappers so callers can access .choices etc.
 # ------------------------------------------------------------------
+
 
 @dataclass(slots=True)
 class _Message:
@@ -50,6 +50,7 @@ class _ChatCompletion:
 # ------------------------------------------------------------------
 # Completions-like interface
 # ------------------------------------------------------------------
+
 
 class _CachedCompletions:
     """Mimics ``openai.chat.completions`` with caching."""
@@ -167,8 +168,7 @@ class CachedOpenAI:
                 import openai
             except ImportError as exc:
                 raise ImportError(
-                    "openai is required for CachedOpenAI. "
-                    "Install it with: pip install openai"
+                    "openai is required for CachedOpenAI. Install it with: pip install openai"
                 ) from exc
             kwargs: dict[str, Any] = {}
             if api_key is not None:
